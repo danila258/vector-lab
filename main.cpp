@@ -23,7 +23,7 @@ int main() {
     print(arr);
 
     arr.popBack();
-    arr.popFront(); //error
+    arr.popFront();
     print(arr);
 
     arr.insert(-1, 0);
