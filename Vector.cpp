@@ -2,9 +2,15 @@
 #include <cmath>
 
 Vector::Vector(const Value* rawArray, const size_t size, float coef):
-    _size(size), _multiplicativeCoef(coef) {
+        _size(size), _multiplicativeCoef(coef) {
 
-    _capacity = std::ceil(float(_size) * _multiplicativeCoef);
+    if (size == 0) {
+        _capacity = std::ceil(coef);
+    }
+    else {
+        _capacity = std::ceil(float(_size) * _multiplicativeCoef);
+    }
+
     _data = new Value[_capacity];
 
     for (size_t i = 0; i < _size; ++i) {
@@ -13,7 +19,7 @@ Vector::Vector(const Value* rawArray, const size_t size, float coef):
 }
 
 Vector:: Vector(const Vector& other):
-    Vector(other._data, other._size, other._multiplicativeCoef) {}
+        Vector(other._data, other._size, other._multiplicativeCoef) {}
 
 Vector::~Vector() {
     delete[] _data;
@@ -25,17 +31,17 @@ Vector& Vector::operator=(const Vector& other) {
     }
 
     Vector vectorCopy(other);
-    classObjectsSwap(*this, vectorCopy);
+    reverseFields(*this, vectorCopy);
 
     return *this;
 }
 
 Vector::Vector(Vector&& other) noexcept {
-    classObjectsSwap(*this, other);
+    reverseFields(*this, other);
 }
 
 Vector& Vector::operator=(Vector&& other) noexcept {
-    classObjectsSwap(*this, other);
+    reverseFields(*this, other);
     return *this;
 }
 
@@ -48,20 +54,13 @@ const Value& Vector::operator[](size_t idx) const {
 }
 
 void Vector::pushBack(const Value& value) {
-    if (_size == _capacity) {
-        Vector vectorCopy(*this);
-        *this = std::move(vectorCopy);
-    }
-
+    sizeControl();
     ++_size;
     _data[_size - 1] = value;
 }
 
 void Vector::pushFront(const Value& value) {
-    if (_size == _capacity) {
-        Vector vectorCopy(*this);
-        *this = std::move(vectorCopy);
-    }
+    sizeControl();
 
     for (size_t i = 1; i < _size + 1; ++i) {
         std::swap(_data[0], _data[i]);
@@ -72,6 +71,8 @@ void Vector::pushFront(const Value& value) {
 }
 
 void Vector::insert(const Value& value, size_t pos) {
+    sizeControl();
+
     for (size_t i = pos + 1; i < _size + 1; ++i) {
         std::swap(_data[pos], _data[i]);
     }
@@ -92,14 +93,15 @@ void Vector::insert(const Vector& vector, size_t pos) {
 }
 
 void Vector::popBack() {
-    --_size;
+    if (_size > 0) {
+        --_size;
+    }
 }
 
 void Vector::popFront() {
-    for (size_t i = 0; i < _size; ++i) {
-        _data[i] = _data[i + 1];
+    if (_size > 0) {
+        erase(0, 1);
     }
-    --_size;
 }
 
 void Vector::erase(size_t pos, size_t count) {
@@ -144,10 +146,22 @@ long long Vector::find(const Value& value) const {
 }
 
 void Vector::reserve(size_t capacity) {
+    float copyCoefficient;
+    Vector vectorCopy;
+
     if (capacity > _capacity) {
-        _multiplicativeCoef = float(capacity) / float(this->_size);
-        Vector vectorCopy(this->_data, _size, _multiplicativeCoef);
+        if (_size != 0) {
+            copyCoefficient = float(capacity) / float(this->_size);
+            vectorCopy = Vector(this->_data, _size, copyCoefficient);
+        }
+        else {
+            vectorCopy = Vector(this->_data, _size, capacity);
+        }
+
+        copyCoefficient = this->_multiplicativeCoef;
+
         *this = std::move(vectorCopy);
+        this->_multiplicativeCoef = copyCoefficient;
     }
 }
 
@@ -155,13 +169,21 @@ void Vector::shrinkToFit() {
     float copyCoefficient = 1;
     Vector vectorCopy(_data, _size, copyCoefficient);
     copyCoefficient = this->_multiplicativeCoef;
+
     *this = std::move(vectorCopy);
     this->_multiplicativeCoef = copyCoefficient;
 }
 
-void Vector::classObjectsSwap(Vector& base, Vector& copy) {
+void Vector::reverseFields(Vector& base, Vector& copy) {
     std::swap(base._data, copy._data);
     base._size = copy._size;
     base._capacity = copy._capacity;
     base._multiplicativeCoef = copy._multiplicativeCoef;
+}
+
+void Vector::sizeControl() {
+    if (_size == _capacity) {
+        Vector vectorCopy(*this);
+        *this = std::move(vectorCopy);
+    }
 }

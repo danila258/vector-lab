@@ -1,4 +1,3 @@
-#pragma once
 #include <iostream>
 
 using Value = double;
@@ -111,7 +110,8 @@ private:
     size_t _capacity = 0;
     float _multiplicativeCoef = 2.0f;
 
-    void classObjectsSwap(Vector& base, Vector& copy);
+    void reverseFields(Vector& base, Vector& copy);
+    void sizeControl();
 };
 
 
