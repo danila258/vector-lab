@@ -111,10 +111,6 @@ private:
     size_t _capacity = 0;
     float _multiplicativeCoef = 2.0f;
 
-    void reverseFieldsDestructCopy(Vector& base, Vector& copy);
-    void sizeControl();
-    void cleanVector();
+    void sizeControl(size_t size);
     void errorShow() const;
 };
-
-
