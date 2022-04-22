@@ -165,8 +165,6 @@ void Vector::reserve(size_t capacity) {
     copyCoefficient = this->_multiplicativeCoef;
 
     *this = std::move(vectorCopy);
-    vectorCopy.cleanVector();
-
     this->_multiplicativeCoef = copyCoefficient;
 }
 
@@ -177,21 +175,12 @@ void Vector::shrinkToFit() {
         Vector vectorCopy(_data, _size, 1);
         *this = std::move(vectorCopy);
         this->_multiplicativeCoef = copyCoefficient;
-
-        vectorCopy.cleanVector();
     }
     else {
         delete this->_data;
         _data = nullptr;
         _capacity = 0;
     }
-}
-
-void Vector::cleanVector() {
-    this->_data = nullptr;
-    this->_size = 0;
-    this->_multiplicativeCoef = 0;
-    this->_capacity = 0;
 }
 
 void Vector::sizeControl(size_t size) {
