@@ -43,15 +43,14 @@ Vector& Vector::operator=(const Vector& other) {
 }
 
 Vector::Vector(Vector&& other) noexcept {
-    *this = other;
+    *this = std::move(other);
 }
 
 Vector& Vector::operator=(Vector&& other) noexcept {
-    std::swap(this->_data, other._data);
-    this->_size = other._size;
-    this->_capacity = other._capacity;
-    this->_multiplicativeCoef = other._multiplicativeCoef;
-    other.cleanVector();
+    std::swap(_data, other._data);
+    std::swap(_size, other._size);
+    std::swap(_capacity, other._capacity);
+    std::swap(_multiplicativeCoef, other._multiplicativeCoef);
 
     return *this;
 }
