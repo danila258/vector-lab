@@ -4,7 +4,9 @@
 Vector::Vector(const Value* rawArray, const size_t size, float coef):
         _size(size), _multiplicativeCoef(coef) {
 
-    if (_multiplicativeCoef < 1) _multiplicativeCoef = 2;
+    if (_multiplicativeCoef < 1) {
+        _multiplicativeCoef = 2;
+    }
 
     if (size == 0) {
         _capacity = int(coef);
@@ -15,12 +17,14 @@ Vector::Vector(const Value* rawArray, const size_t size, float coef):
 
     _data = new Value[_capacity];
 
-    for (size_t i = 0; i < _size; ++i) {
-        _data[i] = rawArray[i];
-    }
+    //if (rawArray != nullptr) {
+        for (size_t i = 0; i < _size; ++i) {
+            _data[i] = rawArray[i];
+        }
+    //}
 }
 
-Vector:: Vector(const Vector& other):
+Vector::Vector(const Vector& other):
         Vector(other._data, other._size, other._multiplicativeCoef) {}
 
 Vector::~Vector() {
@@ -64,7 +68,7 @@ void Vector::pushFront(const Value& value) {
 }
 
 void Vector::insert(const Value& value, size_t pos) {
-    sizeControl();
+    sizeControl(1);
 
     for (size_t i = pos + 1; i < _size + 1; ++i) {
         std::swap(_data[pos], _data[i]);
@@ -75,6 +79,8 @@ void Vector::insert(const Value& value, size_t pos) {
 }
 
 void Vector::insert(const Value* values, size_t size, size_t pos) {
+    sizeControl(size);
+
     for (size_t i = 0; i < size; ++i) {
         insert(values[i], pos);
         ++pos;
@@ -140,22 +146,24 @@ void Vector::reserve(size_t capacity) {
     float copyCoefficient;
     Vector vectorCopy;
 
-    if (capacity > _capacity) {
-        if (_size != 0) {
-            copyCoefficient = float(capacity) / float(this->_size);
-            vectorCopy = Vector(this->_data, _size, copyCoefficient);
-        }
-        else {
-            vectorCopy = Vector(this->_data, _size, capacity);
-        }
-
-        copyCoefficient = this->_multiplicativeCoef;
-
-        *this = std::move(vectorCopy);
-        vectorCopy.cleanVector();
-
-        this->_multiplicativeCoef = copyCoefficient;
+    if (capacity <= _capacity) {
+        return;
     }
+
+    if (_size != 0) {
+        copyCoefficient = float(capacity) / float(this->_size);
+        vectorCopy = Vector(this->_data, _size, copyCoefficient);
+    }
+    else {
+        vectorCopy = Vector(this->_data, _size, capacity);
+    }
+
+    copyCoefficient = this->_multiplicativeCoef;
+
+    *this = std::move(vectorCopy);
+    vectorCopy.cleanVector();
+
+    this->_multiplicativeCoef = copyCoefficient;
 }
 
 void Vector::shrinkToFit() {
@@ -170,7 +178,7 @@ void Vector::shrinkToFit() {
     }
     else {
         delete this->_data;
-        _data = new Value(0);
+        _data = nullptr;
         _capacity = 0;
     }
 }
@@ -183,19 +191,19 @@ void Vector::reverseFieldsDestructCopy(Vector& base, Vector& copy) {
     copy.cleanVector();
 }
 
-void Vector::sizeControl() {
-    if (_size == _capacity) {
-        Vector vectorCopy(*this);
-        *this = std::move(vectorCopy);
-        vectorCopy.cleanVector();
-    }
-}
-
 void Vector::cleanVector() {
     this->_data = nullptr;
     this->_size = 0;
     this->_multiplicativeCoef = 0;
     this->_capacity = 0;
+}
+
+void Vector::sizeControl(size_t size) {
+    if (this->size() + size <= this->_capacity) {
+        return;
+    }
+
+    this->reserve((this->size() + size) * this->_multiplicativeCoef);
 }
 
 void Vector::errorShow() const {

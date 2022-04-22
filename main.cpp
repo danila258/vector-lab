@@ -9,34 +9,33 @@ void print(Vector& array) {
 }
 
 int main() {
-    double array[5] = {1, 2, 3, 4, 5};
-    Vector arr(array, 5);
-
-    std::cout << arr[0] << "\n";
-
-    arr.pushBack(6);
-    arr.pushFront(0);
-    print(arr);
-
-    arr.erase(0, 1);
-    arr.eraseBetween(0, 1);
-    print(arr);
-
-    arr.popBack();
-    arr.popFront();
-    print(arr);
-
-    arr.insert(-1, 0);
-    print(arr);
-
-    std::cout << arr.find(-1) << "\n";
-
-    arr.reserve(20);
-    std::cout << arr.capacity() << "\n";
+    double array[0] = {};
+    Vector arr(array, 0);
 
     arr.shrinkToFit();
-    std::cout << arr.capacity() << " == " << arr.size() << "\n";
-    std::cout << arr.loadFactor() << "\n";
+    std::cout << "size = " << arr.size() << "\n";
+    std::cout << "opacity = " << arr.capacity() << "\n";
+
+    arr.pushFront(1);
+    arr.pushFront(1);
+    arr.pushFront(1);
+
+    std::cout << "size = " << arr.size() << "\n";
+    std::cout << "opacity = " << arr.capacity() << "\n";
+
+    arr.shrinkToFit();
+    std::cout << "size = " << arr.size() << "\n";
+    std::cout << "opacity = " << arr.capacity() << "\n";
+
+    arr.insert(1, 0);
+    std::cout << "size = " << arr.size() << "\n";
+    std::cout << "opacity = " << arr.capacity() << "\n";
+
+    arr.insert(2, 1);
+    std::cout << "size = " << arr.size() << "\n";
+    std::cout << "opacity = " << arr.capacity() << "\n";
+
+    print(arr);
 
     return 0;
 }
