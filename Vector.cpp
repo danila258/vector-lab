@@ -17,11 +17,11 @@ Vector::Vector(const Value* rawArray, const size_t size, float coef):
 
     _data = new Value[_capacity];
 
-    //if (rawArray != nullptr) {
-        for (size_t i = 0; i < _size; ++i) {
-            _data[i] = rawArray[i];
-        }
-    //}
+
+    for (size_t i = 0; i < _size; ++i) {
+        _data[i] = rawArray[i];
+    }
+
 }
 
 Vector::Vector(const Vector& other):
@@ -37,17 +37,22 @@ Vector& Vector::operator=(const Vector& other) {
     }
 
     Vector vectorCopy(other);
-    reverseFieldsDestructCopy(*this, vectorCopy);
+    *this = std::move(vectorCopy);
 
     return *this;
 }
 
 Vector::Vector(Vector&& other) noexcept {
-    reverseFieldsDestructCopy(*this, other);
+    *this = other;
 }
 
 Vector& Vector::operator=(Vector&& other) noexcept {
-    reverseFieldsDestructCopy(*this, other);
+    std::swap(this->_data, other._data);
+    this->_size = other._size;
+    this->_capacity = other._capacity;
+    this->_multiplicativeCoef = other._multiplicativeCoef;
+    other.cleanVector();
+
     return *this;
 }
 
@@ -181,14 +186,6 @@ void Vector::shrinkToFit() {
         _data = nullptr;
         _capacity = 0;
     }
-}
-
-void Vector::reverseFieldsDestructCopy(Vector& base, Vector& copy) {
-    std::swap(base._data, copy._data);
-    base._size = copy._size;
-    base._capacity = copy._capacity;
-    base._multiplicativeCoef = copy._multiplicativeCoef;
-    copy.cleanVector();
 }
 
 void Vector::cleanVector() {
