@@ -20,7 +20,6 @@ Vector::Vector(const Value* rawArray, const size_t size, float coef):
     for (size_t i = 0; i < _size; ++i) {
         _data[i] = rawArray[i];
     }
-
 }
 
 Vector::Vector(const Vector& other):
